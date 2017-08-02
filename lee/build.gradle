@@ -1,0 +1,87 @@
+apply plugin: 'com.android.application'
+
+def skinName = "lee.skin"
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
+
+    defaultConfig {
+        applicationId "com.lxx.lee"
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
+}
+
+final def TARGET_SKIN_DIR = '../skin-package/'
+
+gradle.projectsEvaluated {
+    assembleRelease.doLast {
+        println("=====================assembleRelease.doLast.begin.=========================")
+
+        def dir = new File(TARGET_SKIN_DIR)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+
+        def f = new File(TARGET_SKIN_DIR + skinName)
+        if (f.exists()) {
+            f.delete()
+        }
+
+        copy {
+            from('build/outputs/apk')
+            into(TARGET_SKIN_DIR)
+            include '*.apk'
+            exclude '**/*-unaligned.apk'
+            rename('android-skin-loader-skin-release.apk', skinName)
+        }
+
+        println("=====================assembleRelease.doLast success.=========================")
+    }
+
+    assembleDebug.doLast {
+        println("=====================assembleDebug.doLast.begin.=========================")
+
+        def dir = new File(TARGET_SKIN_DIR)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+
+        def f = new File(TARGET_SKIN_DIR + skinName)
+        if (f.exists()) {
+            f.delete()
+        }
+
+        copy {
+            from('build/outputs/apk')
+            into(TARGET_SKIN_DIR)
+            include '*.apk'
+            exclude '**/*-unaligned.apk'
+            rename('android-skin-loader-skin-debug.apk', skinName)
+        }
+
+        println("=====================assembleDebug.doLast success.=========================")
+    }
+}
